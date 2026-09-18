@@ -1,6 +1,7 @@
 /**
  * Backend entry: create and start the HTTP server, register API routes.
- * Posts live in PostgreSQL; uploaded images are stored under server/uploads/.
+ * Posts live in PostgreSQL; images go to Cloudinary when configured,
+ * otherwise server/uploads/.
  */
 import "dotenv/config";
 import cors from "cors";
@@ -24,7 +25,7 @@ import {
   updatePostById,
 } from "./postsRepo.js";
 import { parseNewPost, parsePostUpdate } from "./types.js";
-import { publicUploadUrl, uploadImage, uploadsDir } from "./uploads.js";
+import { storeUploadedImage, uploadImage, uploadsDir } from "./uploads.js";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -162,25 +163,34 @@ app.post("/api/posts/:id/view", async (req, res) => {
 
 app.post("/api/uploads", requireAuth, (req, res) => {
   uploadImage(req, res, (error) => {
-    if (error) {
-      const message =
-        error instanceof Error ? error.message : "Upload failed.";
-      const status =
-        error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE"
-          ? 400
-          : 400;
-      res.status(status).json({ error: message });
-      return;
-    }
+    void (async () => {
+      if (error) {
+        const message =
+          error instanceof Error ? error.message : "Upload failed.";
+        const status =
+          error instanceof multer.MulterError &&
+          error.code === "LIMIT_FILE_SIZE"
+            ? 400
+            : 400;
+        res.status(status).json({ error: message });
+        return;
+      }
 
-    if (!req.file) {
-      res.status(400).json({
-        error: 'Expected a single image file field named "image".',
-      });
-      return;
-    }
+      if (!req.file) {
+        res.status(400).json({
+          error: 'Expected a single image file field named "image".',
+        });
+        return;
+      }
 
-    res.status(201).json({ url: publicUploadUrl(req.file.filename) });
+      try {
+        const url = await storeUploadedImage(req.file);
+        res.status(201).json({ url });
+      } catch (uploadError) {
+        console.error("Failed to store upload:", uploadError);
+        res.status(500).json({ error: "Failed to upload image." });
+      }
+    })();
   });
 });
 

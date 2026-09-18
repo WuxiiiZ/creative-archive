@@ -1,6 +1,6 @@
 # Creative Archive API (Backend)
 
-Node + Express + TypeScript HTTP API for the Creative Archive frontend. Posts are stored in **PostgreSQL**. Image files are saved under `server/uploads/` and referenced by URL in each post’s `images` array. Admin write routes require a JWT from `/api/auth/login`.
+Node + Express + TypeScript HTTP API for the Creative Archive frontend. Posts are stored in **PostgreSQL**. Images go to **Cloudinary** when `CLOUDINARY_*` is set; otherwise they are saved under `server/uploads/` and referenced by URL in each post’s `images` array. Admin write routes require a JWT from `/api/auth/login`.
 
 The frontend has Chinese and English editions that read the **same** post list (public at `/` vs `/en/`, admin at `/admin` vs `/en/admin`):
 
@@ -18,7 +18,8 @@ Create / update / delete on this API therefore refresh both editions together.
 | **Node.js** | Runtime |
 | **Express** | HTTP server and routes |
 | **PostgreSQL** | Persistent post storage (`pg`) |
-| **multer** | Local image uploads to `uploads/` |
+| **multer** | Multipart image uploads |
+| **cloudinary** | Cloud image storage when configured |
 | **TypeScript** | Source language (`tsc` → `dist/`) |
 | **cors** | Allows the Vite/Vercel frontend origin |
 | **jsonwebtoken** | Sign and verify admin JWTs |
@@ -67,7 +68,7 @@ server/
 │   ├── index.ts        # App entry: middleware, routes, listen
 │   ├── db.ts           # pg pool + schema bootstrap
 │   ├── postsRepo.ts    # Post CRUD against PostgreSQL
-│   ├── uploads.ts      # multer disk storage + public URL helper
+│   ├── uploads.ts      # Cloudinary or local disk + public URL helper
 │   ├── auth.ts         # Login helpers + requireAuth middleware
 │   └── types.ts        # Post model + request validation
 └── dist/               # Build output (generated, gitignored at repo root)
@@ -80,7 +81,7 @@ server/
 | `src/index.ts` | Creates Express, CORS + JSON, static `/uploads`, auth + posts + upload routes. |
 | `src/db.ts` | `DATABASE_URL` pool; `ensureSchema()` creates `posts` if missing. |
 | `src/postsRepo.ts` | List / insert / update / delete posts in PostgreSQL. |
-| `src/uploads.ts` | Saves images under `uploads/`; builds `PUBLIC_BASE_URL/uploads/...` URLs. |
+| `src/uploads.ts` | Uploads to Cloudinary when configured; else `uploads/` + `PUBLIC_BASE_URL`. |
 | `src/auth.ts` | Checks admin username/password, signs JWT, `requireAuth` for protected routes. |
 | `src/types.ts` | `Post` / `Section` types; `parseNewPost()` / `parsePostUpdate()` validate bodies. |
 
@@ -126,7 +127,11 @@ Upload: `multipart/form-data` with field name `image` (JPEG / PNG / WebP / GIF, 
 | `PORT` | `3001` | Listen port |
 | `CORS_ORIGIN` | `http://localhost:5173` | Allowed frontend origin(s), comma-separated |
 | `DATABASE_URL` | `postgresql://localhost:5432/creative_archive` | Postgres connection string |
-| `PUBLIC_BASE_URL` | `http://localhost:3001` | Origin used when building upload URLs |
+| `PUBLIC_BASE_URL` | `http://localhost:3001` | Origin for local-disk upload URLs |
+| `CLOUDINARY_CLOUD_NAME` | — | Cloudinary cloud name (with key + secret → cloud uploads) |
+| `CLOUDINARY_API_KEY` | — | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | — | Cloudinary API secret |
+| `CLOUDINARY_FOLDER` | `creative-archive` | Optional Media Library folder |
 | `JWT_SECRET` | dev fallback | Secret used to sign tokens |
 | `ADMIN_USERNAME` | `admin` | Login username |
 | `ADMIN_PASSWORD` | `admin` | Login password |

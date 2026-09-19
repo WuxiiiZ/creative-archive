@@ -134,7 +134,7 @@ Upload: `multipart/form-data` with field name `image` (JPEG / PNG / WebP / GIF, 
 | `CLOUDINARY_API_SECRET` | — | Cloudinary API secret |
 | `CLOUDINARY_FOLDER` | `creative-archive` | Optional Media Library folder |
 | `GEMINI_API_KEY` | — | Enables compose AI assist |
-| `GEMINI_MODEL` | `gemini-1.5-flash` | Optional model override |
+| `GEMINI_MODEL` | `gemini-3.6-flash` | Optional model override |
 | `JWT_SECRET` | dev fallback | Secret used to sign tokens |
 | `ADMIN_USERNAME` | `admin` | Login username |
 | `ADMIN_PASSWORD` | `admin` | Login password |

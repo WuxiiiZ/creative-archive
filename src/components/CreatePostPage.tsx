@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Section } from "../types/postSection";
 import type { Post } from "../types/post";
 import { requestAiAssist, type AiAssistAction } from "../api/ai";
@@ -18,6 +18,11 @@ interface CreatePostPageProps {
   availableSubtags: string[];
   initialPost?: Post;
   submitLabel?: string;
+}
+
+interface AiOutput {
+  title: string;
+  text: string;
 }
 
 export default function CreatePostPage({
@@ -43,8 +48,9 @@ export default function CreatePostPage({
 
   const [aiBusy, setAiBusy] = useState(false);
   const [aiMessage, setAiMessage] = useState<string | null>(null);
-  const [aiCritique, setAiCritique] = useState<string | null>(null);
+  const [aiOutput, setAiOutput] = useState<AiOutput | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
+  const aiCache = useRef(new Map<string, AiOutput>());
 
   const title = isEditing ? copy.compose.editTitle : copy.compose.createTitle;
   const eyebrow = isEditing
@@ -54,11 +60,30 @@ export default function CreatePostPage({
   const buttonLabel =
     submitLabel ?? (isEditing ? copy.compose.update : copy.compose.save);
 
+  function resultTitleFor(action: AiAssistAction): string {
+    if (action === "summarize") return copy.compose.aiSummarize;
+    if (action === "proofread") return copy.compose.aiProofread;
+    return copy.compose.aiCritiqueTitle;
+  }
+
   async function runAi(action: AiAssistAction) {
     const content = formData.content.trim();
     if (!content) {
-      setAiCritique(null);
+      setAiOutput(null);
       setAiMessage(copy.compose.aiNeedContent);
+      return;
+    }
+
+    const cacheKey = JSON.stringify([
+      action,
+      locale,
+      formData.title,
+      content,
+    ]);
+    const cached = aiCache.current.get(cacheKey);
+    if (cached) {
+      setAiOutput(cached);
+      setAiMessage(copy.compose.aiCached);
       return;
     }
 
@@ -72,20 +97,23 @@ export default function CreatePostPage({
         locale,
       });
 
-      if (action === "summarize") {
-        updateField("summary", result.text.slice(0, 160));
-        setAiCritique(null);
-        setAiMessage(copy.compose.aiAppliedSummary);
-      } else if (action === "proofread") {
-        updateField("content", result.text);
-        setAiCritique(null);
-        setAiMessage(copy.compose.aiAppliedProofread);
-      } else {
-        setAiCritique(result.text);
-        setAiMessage(null);
+      const output = {
+        title: resultTitleFor(action),
+        text: result.text,
+      };
+
+      // Keep a small per-edit-session cache so returning to the same action
+      // for unchanged text does not spend another model request.
+      if (aiCache.current.size >= 12) {
+        const oldestKey = aiCache.current.keys().next().value;
+        if (oldestKey) aiCache.current.delete(oldestKey);
       }
+      aiCache.current.set(cacheKey, output);
+
+      setAiMessage(null);
+      setAiOutput(output);
     } catch (error) {
-      setAiCritique(null);
+      setAiOutput(null);
       setAiMessage(
         error instanceof Error ? error.message : copy.compose.aiFailed,
       );
@@ -347,12 +375,10 @@ export default function CreatePostPage({
               {aiMessage}
             </p>
           ) : null}
-          {aiCritique ? (
-            <div className="compose-form__ai-critique" aria-live="polite">
-              <p className="compose-form__ai-critique-title">
-                {copy.compose.aiCritiqueTitle}
-              </p>
-              <p className="compose-form__ai-critique-body">{aiCritique}</p>
+          {aiOutput ? (
+            <div className="compose-ai-panel__result" aria-live="polite">
+              <p className="compose-ai-panel__result-title">{aiOutput.title}</p>
+              <p className="compose-ai-panel__result-body">{aiOutput.text}</p>
             </div>
           ) : null}
         </aside>

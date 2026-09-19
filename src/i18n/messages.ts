@@ -137,6 +137,7 @@ export interface Messages {
     aiWorking: string;
     aiNeedContent: string;
     aiFailed: string;
+    aiCached: string;
     aiCritiqueTitle: string;
     aiAppliedSummary: string;
     aiAppliedProofread: string;
@@ -303,7 +304,7 @@ export const en: Messages = {
     removeTag: "Remove",
     charCount: (n) => `${n} chars`,
     aiLabel: "AI assist",
-    aiHint: "Uses your current title and body. Summary fills the summary field; proofread rewrites the body; critique stays in the panel.",
+    aiHint: "Uses your current title and body. All results stay in this panel — nothing is written into the form automatically.",
     aiOpen: "Open AI",
     aiClose: "Close AI",
     aiPreviewLabel: "Current content",
@@ -314,9 +315,10 @@ export const en: Messages = {
     aiWorking: "Thinking…",
     aiNeedContent: "Write some body text first.",
     aiFailed: "AI assist failed",
+    aiCached: "Showing the previous result — the text has not changed.",
     aiCritiqueTitle: "Critique",
-    aiAppliedSummary: "Summary updated.",
-    aiAppliedProofread: "Body corrected.",
+    aiAppliedSummary: "Summary ready in the panel.",
+    aiAppliedProofread: "Corrections ready in the panel.",
   },
   form: {
     titleRequired: "Title is required",
@@ -478,7 +480,7 @@ export const zh: Messages = {
     removeTag: "移除",
     charCount: (n) => `${n} 字`,
     aiLabel: "AI 助手",
-    aiHint: "基于当前标题与正文。总结会写入摘要；纠错会改写正文；评价显示在下方面板。",
+    aiHint: "基于当前标题与正文。结果只显示在本窗口，不会自动改表单字段。",
     aiOpen: "打开 AI",
     aiClose: "关闭 AI",
     aiPreviewLabel: "当前正文",
@@ -489,9 +491,10 @@ export const zh: Messages = {
     aiWorking: "思考中…",
     aiNeedContent: "请先写一点正文。",
     aiFailed: "AI 助手失败",
+    aiCached: "正文未变化，已显示上次分析结果。",
     aiCritiqueTitle: "评价",
-    aiAppliedSummary: "已写入摘要。",
-    aiAppliedProofread: "已修正正文。",
+    aiAppliedSummary: "总结已显示在窗口。",
+    aiAppliedProofread: "纠错建议已显示在窗口。",
   },
   form: {
     titleRequired: "请填写标题",

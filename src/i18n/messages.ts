@@ -125,6 +125,21 @@ export interface Messages {
     tagsSuggestions: string;
     removeTag: string;
     charCount: (n: number) => string;
+    aiLabel: string;
+    aiHint: string;
+    aiOpen: string;
+    aiClose: string;
+    aiPreviewLabel: string;
+    aiPreviewEmpty: string;
+    aiSummarize: string;
+    aiCritique: string;
+    aiProofread: string;
+    aiWorking: string;
+    aiNeedContent: string;
+    aiFailed: string;
+    aiCritiqueTitle: string;
+    aiAppliedSummary: string;
+    aiAppliedProofread: string;
   };
   form: {
     titleRequired: string;
@@ -287,6 +302,21 @@ export const en: Messages = {
     tagsSuggestions: "suggestions",
     removeTag: "Remove",
     charCount: (n) => `${n} chars`,
+    aiLabel: "AI assist",
+    aiHint: "Uses your current title and body. Summary fills the summary field; proofread rewrites the body; critique stays in the panel.",
+    aiOpen: "Open AI",
+    aiClose: "Close AI",
+    aiPreviewLabel: "Current content",
+    aiPreviewEmpty: "No content yet. Write a draft first.",
+    aiSummarize: "Summarize",
+    aiCritique: "Critique",
+    aiProofread: "Proofread",
+    aiWorking: "Thinking…",
+    aiNeedContent: "Write some body text first.",
+    aiFailed: "AI assist failed",
+    aiCritiqueTitle: "Critique",
+    aiAppliedSummary: "Summary updated.",
+    aiAppliedProofread: "Body corrected.",
   },
   form: {
     titleRequired: "Title is required",
@@ -447,6 +477,21 @@ export const zh: Messages = {
     tagsSuggestions: "建议",
     removeTag: "移除",
     charCount: (n) => `${n} 字`,
+    aiLabel: "AI 助手",
+    aiHint: "基于当前标题与正文。总结会写入摘要；纠错会改写正文；评价显示在下方面板。",
+    aiOpen: "打开 AI",
+    aiClose: "关闭 AI",
+    aiPreviewLabel: "当前正文",
+    aiPreviewEmpty: "还没有正文，请先写一点内容。",
+    aiSummarize: "总结",
+    aiCritique: "评价",
+    aiProofread: "纠错语病",
+    aiWorking: "思考中…",
+    aiNeedContent: "请先写一点正文。",
+    aiFailed: "AI 助手失败",
+    aiCritiqueTitle: "评价",
+    aiAppliedSummary: "已写入摘要。",
+    aiAppliedProofread: "已修正正文。",
   },
   form: {
     titleRequired: "请填写标题",

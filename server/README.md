@@ -96,6 +96,7 @@ server/
 | `PUT` | `/api/posts/:id` | Bearer JWT | Update a post |
 | `DELETE` | `/api/posts/:id` | Bearer JWT | Delete a post |
 | `POST` | `/api/uploads` | Bearer JWT | Multipart field `image` → `{ url }` |
+| `POST` | `/api/ai/assist` | Bearer JWT | `{ action, title?, content, locale? }` → `{ action, text }` (`summarize` \| `critique` \| `proofread`) |
 | `GET` | `/uploads/:file` | No | Serve a locally uploaded image |
 
 Example login:
@@ -132,6 +133,8 @@ Upload: `multipart/form-data` with field name `image` (JPEG / PNG / WebP / GIF, 
 | `CLOUDINARY_API_KEY` | — | Cloudinary API key |
 | `CLOUDINARY_API_SECRET` | — | Cloudinary API secret |
 | `CLOUDINARY_FOLDER` | `creative-archive` | Optional Media Library folder |
+| `GEMINI_API_KEY` | — | Enables compose AI assist |
+| `GEMINI_MODEL` | `gemini-1.5-flash` | Optional model override |
 | `JWT_SECRET` | dev fallback | Secret used to sign tokens |
 | `ADMIN_USERNAME` | `admin` | Login username |
 | `ADMIN_PASSWORD` | `admin` | Login password |

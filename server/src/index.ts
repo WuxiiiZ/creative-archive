@@ -1,7 +1,7 @@
 /**
  * Backend entry: create and start the HTTP server, register API routes.
  * Posts live in PostgreSQL; images go to Cloudinary when configured,
- * otherwise server/uploads/.
+ * otherwise server/uploads/. Optional Gemini assist at /api/ai/assist.
  */
 import "dotenv/config";
 import cors from "cors";
@@ -24,6 +24,11 @@ import {
   listPosts,
   updatePostById,
 } from "./postsRepo.js";
+import {
+  isAiConfigured,
+  parseAiAssistAction,
+  runAiAssist,
+} from "./ai.js";
 import { parseNewPost, parsePostUpdate } from "./types.js";
 import { storeUploadedImage, uploadImage, uploadsDir } from "./uploads.js";
 
@@ -158,6 +163,47 @@ app.post("/api/posts/:id/view", async (req, res) => {
   } catch (error) {
     console.error("Failed to record view:", error);
     res.status(500).json({ error: "Failed to record view." });
+  }
+});
+
+app.post("/api/ai/assist", requireAuth, async (req, res) => {
+  if (!isAiConfigured()) {
+    res.status(503).json({
+      error: "AI is not configured. Set GEMINI_API_KEY on the server.",
+    });
+    return;
+  }
+
+  const action = parseAiAssistAction(
+    (req.body as { action?: unknown }).action,
+  );
+  if (!action) {
+    res.status(400).json({
+      error: 'action must be "summarize", "critique", or "proofread".',
+    });
+    return;
+  }
+
+  const title = String((req.body as { title?: unknown }).title ?? "").trim();
+  const content = String(
+    (req.body as { content?: unknown }).content ?? "",
+  ).trim();
+  const localeRaw = String(
+    (req.body as { locale?: unknown }).locale ?? "en",
+  ).trim();
+  const locale = localeRaw === "zh" ? "zh" : "en";
+
+  if (!content) {
+    res.status(400).json({ error: "content is required." });
+    return;
+  }
+
+  try {
+    const text = await runAiAssist({ action, title, content, locale });
+    res.json({ action, text });
+  } catch (error) {
+    console.error("AI assist failed:", error);
+    res.status(500).json({ error: "AI request failed." });
   }
 });
 

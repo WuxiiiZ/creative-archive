@@ -1,5 +1,7 @@
+import { useState } from "react";
 import type { Section } from "../types/postSection";
 import type { Post } from "../types/post";
+import { requestAiAssist, type AiAssistAction } from "../api/ai";
 import { useCreatePostForm } from "../hooks/useCreatePostForm";
 import { useLocale } from "../hooks/useLocale";
 import {
@@ -25,7 +27,7 @@ export default function CreatePostPage({
   initialPost,
   submitLabel,
 }: CreatePostPageProps) {
-  const { copy } = useLocale();
+  const { copy, locale } = useLocale();
   const {
     formData,
     errors,
@@ -39,6 +41,11 @@ export default function CreatePostPage({
     isEditing,
   } = useCreatePostForm(onCreatePost, { initialPost });
 
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiMessage, setAiMessage] = useState<string | null>(null);
+  const [aiCritique, setAiCritique] = useState<string | null>(null);
+  const [aiOpen, setAiOpen] = useState(false);
+
   const title = isEditing ? copy.compose.editTitle : copy.compose.createTitle;
   const eyebrow = isEditing
     ? copy.compose.editEyebrow
@@ -47,8 +54,51 @@ export default function CreatePostPage({
   const buttonLabel =
     submitLabel ?? (isEditing ? copy.compose.update : copy.compose.save);
 
+  async function runAi(action: AiAssistAction) {
+    const content = formData.content.trim();
+    if (!content) {
+      setAiCritique(null);
+      setAiMessage(copy.compose.aiNeedContent);
+      return;
+    }
+
+    setAiBusy(true);
+    setAiMessage(null);
+    try {
+      const result = await requestAiAssist({
+        action,
+        title: formData.title,
+        content,
+        locale,
+      });
+
+      if (action === "summarize") {
+        updateField("summary", result.text.slice(0, 160));
+        setAiCritique(null);
+        setAiMessage(copy.compose.aiAppliedSummary);
+      } else if (action === "proofread") {
+        updateField("content", result.text);
+        setAiCritique(null);
+        setAiMessage(copy.compose.aiAppliedProofread);
+      } else {
+        setAiCritique(result.text);
+        setAiMessage(null);
+      }
+    } catch (error) {
+      setAiCritique(null);
+      setAiMessage(
+        error instanceof Error ? error.message : copy.compose.aiFailed,
+      );
+    } finally {
+      setAiBusy(false);
+    }
+  }
+
+  const contentPreview = formData.content.trim();
+
   return (
-    <PaperPanel id="compose" variant="cream" className="compose">
+    <>
+      <PaperPanel id="compose" variant="cream" className="compose">
       <PaperPanelHeader>
         <p className="compose__eyebrow">{eyebrow}</p>
         <PaperPanelTitle>{title}</PaperPanelTitle>
@@ -220,13 +270,93 @@ export default function CreatePostPage({
             <button
               className="btn btn--sticker"
               type="submit"
-              disabled={isSubmitting || isUploading}
+              disabled={isSubmitting || isUploading || aiBusy}
             >
               {isSubmitting ? copy.compose.saving : buttonLabel}
             </button>
           </div>
         </form>
       </PaperPanelBody>
-    </PaperPanel>
+      </PaperPanel>
+
+      <button
+        type="button"
+        className="compose-ai-fab"
+        onClick={() => setAiOpen((prev) => !prev)}
+        aria-expanded={aiOpen}
+        aria-controls="compose-ai-panel"
+      >
+        {aiOpen ? copy.compose.aiClose : copy.compose.aiOpen}
+      </button>
+
+      {aiOpen ? (
+        <aside id="compose-ai-panel" className="compose-ai-panel">
+          <header className="compose-ai-panel__header">
+            <p className="compose-ai-panel__title">{copy.compose.aiLabel}</p>
+            <button
+              type="button"
+              className="compose-ai-panel__close"
+              onClick={() => setAiOpen(false)}
+              aria-label={copy.compose.aiClose}
+            >
+              ×
+            </button>
+          </header>
+          <p className="compose-ai-panel__hint">{copy.compose.aiHint}</p>
+          <div className="compose-ai-panel__preview">
+            <p className="compose-ai-panel__preview-label">
+              {copy.compose.aiPreviewLabel}
+            </p>
+            <p className="compose-ai-panel__preview-text">
+              {contentPreview || copy.compose.aiPreviewEmpty}
+            </p>
+          </div>
+          <div className="compose-form__ai-actions" role="group">
+            <button
+              type="button"
+              className="btn btn--ghost compose-form__ai-btn"
+              disabled={aiBusy || isSubmitting || isUploading}
+              onClick={() => void runAi("summarize")}
+            >
+              {copy.compose.aiSummarize}
+            </button>
+            <button
+              type="button"
+              className="btn btn--ghost compose-form__ai-btn"
+              disabled={aiBusy || isSubmitting || isUploading}
+              onClick={() => void runAi("critique")}
+            >
+              {copy.compose.aiCritique}
+            </button>
+            <button
+              type="button"
+              className="btn btn--ghost compose-form__ai-btn"
+              disabled={aiBusy || isSubmitting || isUploading}
+              onClick={() => void runAi("proofread")}
+            >
+              {copy.compose.aiProofread}
+            </button>
+          </div>
+          {aiBusy ? (
+            <p className="compose-form__ai-status" aria-live="polite">
+              {copy.compose.aiWorking}
+            </p>
+          ) : null}
+          {aiMessage ? (
+            <p className="compose-form__ai-status" role="status">
+              {aiMessage}
+            </p>
+          ) : null}
+          {aiCritique ? (
+            <div className="compose-form__ai-critique" aria-live="polite">
+              <p className="compose-form__ai-critique-title">
+                {copy.compose.aiCritiqueTitle}
+              </p>
+              <p className="compose-form__ai-critique-body">{aiCritique}</p>
+            </div>
+          ) : null}
+        </aside>
+      ) : null}
+    </>
   );
 }

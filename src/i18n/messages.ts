@@ -69,6 +69,7 @@ export interface Messages {
     searchPlaceholder: string;
     filterEmptyTitle: string;
     filterEmptyBody: string;
+    summaryPrefix: string;
   };
   postDetail: {
     back: string;
@@ -106,6 +107,7 @@ export interface Messages {
     summary: string;
     optional: string;
     section: string;
+    language: string;
     tags: string;
     subtags: string;
     images: string;
@@ -149,6 +151,10 @@ export interface Messages {
     contentRequired: string;
     saveFailed: string;
     uploadFailed: string;
+    saveSuccess: string;
+    updateSuccess: string;
+    noticeSuccess: string;
+    noticeDismiss: string;
   };
   manage: {
     title: string;
@@ -165,6 +171,10 @@ export interface Messages {
     A: string;
     B: string;
     C: string;
+  };
+  language: {
+    en: string;
+    zh: string;
   };
   error: {
     title: string;
@@ -247,6 +257,7 @@ export const en: Messages = {
     searchPlaceholder: "Search titles, notes, tags…",
     filterEmptyTitle: "No matching entries",
     filterEmptyBody: "Try another section or a shorter search.",
+    summaryPrefix: "Summary: ",
   },
   postDetail: {
     back: "All Content",
@@ -284,6 +295,7 @@ export const en: Messages = {
     summary: "Summary",
     optional: "optional",
     section: "Section",
+    language: "Language",
     tags: "Tags",
     subtags: "Subtags",
     images: "Images",
@@ -327,6 +339,10 @@ export const en: Messages = {
     contentRequired: "Content is required",
     saveFailed: "Failed to save post",
     uploadFailed: "Failed to upload image",
+    saveSuccess: "Post saved.",
+    updateSuccess: "Post updated.",
+    noticeSuccess: "Success",
+    noticeDismiss: "Dismiss",
   },
   manage: {
     title: "Manage Posts",
@@ -343,6 +359,10 @@ export const en: Messages = {
     A: "Writing",
     B: "Design",
     C: "Gallery",
+  },
+  language: {
+    en: "EN",
+    zh: "中文",
   },
   error: {
     title: "Something went wrong",
@@ -423,6 +443,7 @@ export const zh: Messages = {
     searchPlaceholder: "搜标题、正文、标签…",
     filterEmptyTitle: "没有匹配的内容",
     filterEmptyBody: "换个分区，或缩短搜索词再试。",
+    summaryPrefix: "简介：",
   },
   postDetail: {
     back: "所有内容",
@@ -457,9 +478,10 @@ export const zh: Messages = {
     editHint: "改好标题、分区或正文，然后保存。",
     title: "标题",
     content: "正文",
-    summary: "摘要",
+    summary: "简介",
     optional: "可选",
     section: "分区",
+    language: "语言",
     tags: "标签",
     subtags: "子标签",
     images: "图片",
@@ -503,6 +525,10 @@ export const zh: Messages = {
     contentRequired: "请填写正文",
     saveFailed: "保存失败",
     uploadFailed: "图片上传失败",
+    saveSuccess: "帖子已保存。",
+    updateSuccess: "帖子已更新。",
+    noticeSuccess: "成功",
+    noticeDismiss: "关闭",
   },
   manage: {
     title: "管理帖子",
@@ -519,6 +545,10 @@ export const zh: Messages = {
     A: "写作",
     B: "设计",
     C: "展廊",
+  },
+  language: {
+    en: "EN",
+    zh: "中文",
   },
   error: {
     title: "出了点问题",

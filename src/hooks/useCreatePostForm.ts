@@ -1,8 +1,11 @@
 import { useState } from "react";
+import type { PostLanguage } from "../types/postLanguage";
+import { asPostLanguage } from "../types/postLanguage";
 import type { Section } from "../types/postSection";
 import type { Post } from "../types/post";
 import { uploadImage } from "../api/uploads";
 import { useLocale } from "./useLocale";
+import { useNotice } from "./useNotice";
 import type { Messages } from "../i18n/messages";
 
 export interface CreatePostFormData {
@@ -10,6 +13,7 @@ export interface CreatePostFormData {
   summary: string;
   content: string;
   section: Section;
+  language: PostLanguage;
   tags: string[];
   subtags: string[];
   images: string[];
@@ -25,6 +29,7 @@ const emptyFormData: CreatePostFormData = {
   summary: "",
   content: "",
   section: "A",
+  language: "zh",
   tags: [],
   subtags: [],
   images: [],
@@ -36,6 +41,7 @@ function fromPost(post: Post): CreatePostFormData {
     summary: post.summary ?? "",
     content: post.content,
     section: post.section,
+    language: asPostLanguage(post.language),
     tags: [...post.tags.filter(Boolean)],
     subtags: [...post.subtags.filter(Boolean)],
     images: [...(post.images ?? [])],
@@ -73,6 +79,7 @@ function toPost(formData: CreatePostFormData, existing?: Post): Post {
     summary: formData.summary.trim(),
     content: formData.content.trim(),
     section: formData.section,
+    language: formData.language,
     tags: formData.tags.map((tag) => tag.trim()).filter(Boolean),
     subtags: formData.subtags.map((tag) => tag.trim()).filter(Boolean),
     images: [...formData.images],
@@ -87,6 +94,7 @@ export function useCreatePostForm(
   options?: { initialPost?: Post; resetOnSuccess?: boolean },
 ) {
   const { copy } = useLocale();
+  const { showNotice } = useNotice();
   const initialPost = options?.initialPost;
   const resetOnSuccess = options?.resetOnSuccess ?? !initialPost;
 
@@ -153,6 +161,9 @@ export function useCreatePostForm(
     setIsSubmitting(true);
     try {
       await onSave(toPost(formData, initialPost));
+      showNotice(
+        initialPost ? copy.form.updateSuccess : copy.form.saveSuccess,
+      );
       if (resetOnSuccess) {
         setFormData(emptyFormData);
         setErrors({});

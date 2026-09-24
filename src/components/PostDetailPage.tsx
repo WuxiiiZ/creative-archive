@@ -10,6 +10,7 @@ import {
   PaperPanel,
   PaperPanelBody,
 } from "../reusableUI/PaperPanel";
+import { PostLanguageTag } from "../reusableUI/PostLanguageTag";
 
 function formatDate(iso: string, locale: string) {
   return new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en", {
@@ -95,6 +96,7 @@ export function PostDetailPage() {
           >
             {copy.section[post.section]}
           </span>
+          <PostLanguageTag language={post.language} />
           <time className="post-detail__time" dateTime={post.createdAt}>
             {formatDate(post.createdAt, locale)}
           </time>
@@ -113,6 +115,13 @@ export function PostDetailPage() {
         <div className="post-detail__field">
           <dt>{copy.compose.section}</dt>
           <dd>{copy.section[post.section]}</dd>
+        </div>
+
+        <div className="post-detail__field">
+          <dt>{copy.compose.language}</dt>
+          <dd>
+            <PostLanguageTag language={post.language} />
+          </dd>
         </div>
 
         <div className="post-detail__field">

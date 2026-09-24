@@ -6,6 +6,9 @@
 /** Section codes aligned with the frontend Section type */
 export type Section = "A" | "B" | "C";
 
+/** Content language chosen when publishing */
+export type PostLanguage = "en" | "zh";
+
 /** Full post document shape (fields aligned with the frontend Post type) */
 export interface Post {
   id: string;
@@ -14,6 +17,7 @@ export interface Post {
   summary: string;
   content: string;
   section: Section;
+  language: PostLanguage;
   tags: string[];
   subtags: string[];
   images: string[];
@@ -24,10 +28,23 @@ export interface Post {
 }
 
 const SECTIONS: Section[] = ["A", "B", "C"];
+const LANGUAGES: PostLanguage[] = ["en", "zh"];
 
 /** Type guard: whether an unknown value is a valid Section */
 export function isSection(value: unknown): value is Section {
   return typeof value === "string" && SECTIONS.includes(value as Section);
+}
+
+/** Type guard: whether an unknown value is a valid post language */
+export function isPostLanguage(value: unknown): value is PostLanguage {
+  return typeof value === "string" && LANGUAGES.includes(value as PostLanguage);
+}
+
+function asPostLanguage(
+  value: unknown,
+  fallback: PostLanguage = "zh",
+): PostLanguage {
+  return isPostLanguage(value) ? value : fallback;
 }
 
 /** Coerce an unknown value into string[]; non-arrays become [] */
@@ -50,6 +67,7 @@ export function parseNewPost(body: unknown): Post | null {
     typeof data.summary === "string" ? data.summary.trim() : "";
   const content = typeof data.content === "string" ? data.content : "";
   const section = data.section;
+  const language = asPostLanguage(data.language);
 
   if (!title || !isSection(section)) return null;
 
@@ -65,6 +83,7 @@ export function parseNewPost(body: unknown): Post | null {
     summary,
     content,
     section,
+    language,
     tags: asStringArray(data.tags),
     subtags: asStringArray(data.subtags),
     images: asStringArray(data.images),
@@ -99,6 +118,10 @@ export function parsePostUpdate(
   const content =
     typeof data.content === "string" ? data.content : existing.content;
   const section = data.section !== undefined ? data.section : existing.section;
+  const language =
+    data.language !== undefined
+      ? asPostLanguage(data.language, existing.language)
+      : existing.language;
 
   if (!title || !isSection(section)) return null;
 
@@ -108,6 +131,7 @@ export function parsePostUpdate(
     summary,
     content,
     section,
+    language,
     tags: data.tags !== undefined ? asStringArray(data.tags) : existing.tags,
     subtags:
       data.subtags !== undefined

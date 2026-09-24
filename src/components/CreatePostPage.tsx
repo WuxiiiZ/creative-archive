@@ -1,4 +1,6 @@
 import { useRef, useState } from "react";
+import type { PostLanguage } from "../types/postLanguage";
+import { postLanguages } from "../types/postLanguage";
 import type { Section } from "../types/postSection";
 import type { Post } from "../types/post";
 import { requestAiAssist, type AiAssistAction } from "../api/ai";
@@ -212,6 +214,23 @@ export default function CreatePostPage({
               {(Object.keys(copy.section) as Section[]).map((value) => (
                 <option key={value} value={value}>
                   {copy.section[value]}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="compose-form__field compose-form__field--language">
+            <label htmlFor="language">{copy.compose.language}</label>
+            <select
+              id="language"
+              value={formData.language}
+              onChange={(e) =>
+                updateField("language", e.target.value as PostLanguage)
+              }
+            >
+              {postLanguages.map((value) => (
+                <option key={value} value={value}>
+                  {copy.language[value]}
                 </option>
               ))}
             </select>

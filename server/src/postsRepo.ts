@@ -10,6 +10,7 @@ interface PostRow {
   summary: string;
   content: string;
   section: "A" | "B" | "C";
+  language: "en" | "zh" | null;
   tags: string[] | null;
   subtags: string[] | null;
   images: string[] | null;
@@ -18,7 +19,7 @@ interface PostRow {
   updated_at: Date;
 }
 
-const POST_COLUMNS = `id, title, summary, content, section, tags, subtags, images,
+const POST_COLUMNS = `id, title, summary, content, section, language, tags, subtags, images,
             view_count, created_at, updated_at`;
 
 function rowToPost(row: PostRow): Post {
@@ -28,6 +29,7 @@ function rowToPost(row: PostRow): Post {
     summary: row.summary ?? "",
     content: row.content,
     section: row.section,
+    language: row.language === "en" ? "en" : "zh",
     tags: row.tags ?? [],
     subtags: row.subtags ?? [],
     images: row.images ?? [],
@@ -49,10 +51,10 @@ export async function listPosts(): Promise<Post[]> {
 export async function insertPost(post: Post): Promise<Post> {
   const result = await pool.query<PostRow>(
     `INSERT INTO posts (
-       id, title, summary, content, section, tags, subtags, images,
+       id, title, summary, content, section, language, tags, subtags, images,
        view_count, created_at, updated_at
      ) VALUES (
-       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10::timestamptz, $11::timestamptz
+       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::timestamptz, $12::timestamptz
      )
      RETURNING ${POST_COLUMNS}`,
     [
@@ -61,6 +63,7 @@ export async function insertPost(post: Post): Promise<Post> {
       post.summary,
       post.content,
       post.section,
+      post.language,
       post.tags,
       post.subtags,
       post.images,
@@ -90,10 +93,11 @@ export async function updatePostById(post: Post): Promise<Post | null> {
        summary = $3,
        content = $4,
        section = $5,
-       tags = $6,
-       subtags = $7,
-       images = $8,
-       updated_at = $9::timestamptz
+       language = $6,
+       tags = $7,
+       subtags = $8,
+       images = $9,
+       updated_at = $10::timestamptz
      WHERE id = $1
      RETURNING ${POST_COLUMNS}`,
     [
@@ -102,6 +106,7 @@ export async function updatePostById(post: Post): Promise<Post | null> {
       post.summary,
       post.content,
       post.section,
+      post.language,
       post.tags,
       post.subtags,
       post.images,

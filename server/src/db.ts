@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS posts (
   summary TEXT NOT NULL DEFAULT '',
   content TEXT NOT NULL DEFAULT '',
   section TEXT NOT NULL CHECK (section IN ('A', 'B', 'C')),
+  language TEXT NOT NULL DEFAULT 'zh' CHECK (language IN ('en', 'zh')),
   tags TEXT[] NOT NULL DEFAULT '{}',
   subtags TEXT[] NOT NULL DEFAULT '{}',
   images TEXT[] NOT NULL DEFAULT '{}',
@@ -31,6 +32,9 @@ CREATE INDEX IF NOT EXISTS posts_created_at_idx ON posts (created_at DESC);
 
 ALTER TABLE posts
   ADD COLUMN IF NOT EXISTS view_count INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE posts
+  ADD COLUMN IF NOT EXISTS language TEXT NOT NULL DEFAULT 'zh';
 `;
 
 /** Create tables/indexes if missing. Call once before listening. */

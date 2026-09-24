@@ -8,6 +8,7 @@ import { memo } from "react";
 import { Link } from "react-router-dom";
 import type { Post } from "../types/post";
 import { useLocale } from "../hooks/useLocale";
+import { PostLanguageTag } from "./PostLanguageTag";
 
 interface PostCardProps {
   post: Post;
@@ -45,7 +46,12 @@ function PostCard({
   const preview = (
     <>
       <h3 className="post-entry__title">{post.title}</h3>
-      {summary ? <p className="post-entry__summary">{summary}</p> : null}
+      {summary ? (
+        <p className="post-entry__summary">
+          {copy.posts.summaryPrefix}
+          {summary}
+        </p>
+      ) : null}
       {showContent ? (
         <p className="post-entry__body">{post.content}</p>
       ) : null}
@@ -70,6 +76,7 @@ function PostCard({
         >
           {copy.section[post.section]}
         </span>
+        <PostLanguageTag language={post.language} />
         <time className="post-entry__time" dateTime={post.createdAt}>
           {formatDate(post.createdAt, locale)}
         </time>

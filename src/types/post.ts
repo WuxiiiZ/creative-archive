@@ -1,3 +1,4 @@
+import type { PostLanguage } from "./postLanguage";
 import type { Section } from "./postSection";
 
 export interface Post {
@@ -7,6 +8,8 @@ export interface Post {
   summary: string;
   content: string;
   section: Section;
+  /** Content language chosen when publishing. */
+  language: PostLanguage;
   tags: string[];
   subtags: string[];
   images: string[];

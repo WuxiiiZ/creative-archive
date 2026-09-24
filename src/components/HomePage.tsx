@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useArchive } from "../hooks/useArchive";
 import { useLocale } from "../hooks/useLocale";
 import type { Section } from "../types/postSection";
+import { PostLanguageTag } from "../reusableUI/PostLanguageTag";
 import { postsInSection } from "../utils/posts";
 
 const SECTIONS: Section[] = ["A", "B", "C"];
@@ -54,11 +55,18 @@ export function HomePage() {
                         className="home-section__link"
                         to={localizePath(`/posts/${post.id}`)}
                       >
-                        <span className="home-section__post-title">
-                          {post.title}
+                        <span className="home-section__post-heading">
+                          <PostLanguageTag
+                            language={post.language}
+                            className="home-section__post-lang"
+                          />
+                          <span className="home-section__post-title">
+                            {post.title}
+                          </span>
                         </span>
                         {summary ? (
                           <span className="home-section__post-summary">
+                            {copy.posts.summaryPrefix}
                             {clip(summary, 80)}
                           </span>
                         ) : null}

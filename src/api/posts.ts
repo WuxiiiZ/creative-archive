@@ -1,4 +1,5 @@
 import type { Post } from "../types/post";
+import { asPostLanguage } from "../types/postLanguage";
 import { API_BASE_URL } from "./config";
 import { getToken } from "./token";
 
@@ -30,6 +31,7 @@ function normalizePost(post: Post): Post {
   return {
     ...post,
     summary: typeof post.summary === "string" ? post.summary : "",
+    language: asPostLanguage(post.language),
     tags: Array.isArray(post.tags) ? post.tags : [],
     subtags: Array.isArray(post.subtags) ? post.subtags : [],
     images: Array.isArray(post.images) ? post.images : [],

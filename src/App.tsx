@@ -9,6 +9,7 @@ import {
 import { ArchiveProvider } from "./context/ArchiveContext";
 import { AuthProvider } from "./context/AuthContext";
 import { LocaleProvider } from "./context/LocaleContext";
+import { NoticeProvider } from "./context/NoticeContext";
 import { useArchive } from "./hooks/useArchive";
 import { useLocale } from "./hooks/useLocale";
 import { Masthead } from "./reusableUI/Masthead";
@@ -171,7 +172,9 @@ export default function App() {
       <AuthProvider>
         <ArchiveProvider>
           <LocaleProvider>
-            <ArchiveApp />
+            <NoticeProvider>
+              <ArchiveApp />
+            </NoticeProvider>
           </LocaleProvider>
         </ArchiveProvider>
       </AuthProvider>

@@ -1,11 +1,12 @@
 import { API_BASE_URL } from "./config";
+import { classifyHttpError, fetchApi } from "./http";
 import { setToken } from "./token";
 
 export async function login(
   username: string,
   password: string,
 ): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+  const response = await fetchApi(`${API_BASE_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
@@ -19,7 +20,7 @@ export async function login(
     } catch {
       // keep default message
     }
-    throw new Error(message);
+    throw classifyHttpError(response.status, message);
   }
 
   const data = (await response.json()) as { token: string };

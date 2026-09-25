@@ -6,11 +6,14 @@ export interface ArchiveState {
   availableTags: string[];
   availableSubtags: string[];
   loading: boolean;
+  /** True while retrying a cold-start / network failure. */
+  waking: boolean;
   error: string | null;
 }
 
 export type ArchiveAction =
   | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_WAKING"; payload: boolean }
   | { type: "SET_ERROR"; payload: string | null }
   | { type: "SET_POSTS"; payload: Post[] }
   | { type: "ADD_POST"; payload: Post }

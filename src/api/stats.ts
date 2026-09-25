@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "./config";
+import { classifyHttpError, fetchApi } from "./http";
 import { getToken } from "./token";
 
 export interface DeskDayStat {
@@ -22,23 +23,19 @@ export async function fetchDeskStats(): Promise<DeskStatsResponse> {
     throw new Error("Sign in required");
   }
 
-  let response: Response;
-  try {
-    response = await fetch(`${API_BASE_URL}/api/stats/desk`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-  } catch {
-    throw new Error(
-      "Cannot reach the API. Is the backend running on port 3001?",
-    );
-  }
+  const response = await fetchApi(`${API_BASE_URL}/api/stats/desk`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
   if (response.status === 401) {
     throw new Error("Session expired. Please sign in again.");
   }
 
   if (!response.ok) {
-    throw new Error(`Failed to load desk stats (${response.status})`);
+    throw classifyHttpError(
+      response.status,
+      `Failed to load desk stats (${response.status})`,
+    );
   }
 
   return (await response.json()) as DeskStatsResponse;

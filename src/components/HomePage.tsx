@@ -19,8 +19,9 @@ function clip(text: string, max: number) {
 export function HomePage() {
   const { copy, localizePath } = useLocale();
   const {
-    state: { posts },
+    state: { posts, loading, waking, error },
   } = useArchive();
+  const waiting = (loading || waking || Boolean(error)) && posts.length === 0;
 
   return (
     <section className="home-sections" aria-label={copy.home.sectionsLabel}>
@@ -41,7 +42,9 @@ export function HomePage() {
             </header>
 
             {entries.length === 0 ? (
-              <p className="home-section__empty">{copy.home.sectionEmpty}</p>
+              <p className="home-section__empty">
+                {waiting ? copy.home.sectionWaiting : copy.home.sectionEmpty}
+              </p>
             ) : (
               <ul className="home-section__list">
                 {entries.map((post) => {

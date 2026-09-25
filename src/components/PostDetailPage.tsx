@@ -23,7 +23,8 @@ export function PostDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { locale, copy, localizePath } = useLocale();
   const {
-    state: { posts, loading, error },
+    state: { posts, loading, waking, error },
+    refreshPosts,
   } = useArchive();
 
   const post = posts.find((item) => item.id === id);
@@ -43,11 +44,11 @@ export function PostDetailPage() {
     void recordPostView(id);
   }, [id, post]);
 
-  if (loading && !post) {
+  if ((loading || waking) && !post) {
     return (
       <PaperPanel variant="cream" className="post-detail">
         <PaperPanelBody>
-          <p className="post-detail__status">{copy.postDetail.loading}</p>
+          <p className="post-detail__status">{copy.connection.wakingBody}</p>
         </PaperPanelBody>
       </PaperPanel>
     );
@@ -58,8 +59,17 @@ export function PostDetailPage() {
       <PaperPanel variant="lavender" className="post-detail">
         <PaperPanelBody>
           <p className="post-detail__status" role="alert">
-            {error}
+            {copy.connection.unavailableBody}
           </p>
+          <button
+            type="button"
+            className="btn btn--sticker"
+            onClick={() => {
+              void refreshPosts();
+            }}
+          >
+            {copy.connection.retry}
+          </button>
           <Link className="post-detail__back" to={localizePath("/posts")}>
             ← {copy.postDetail.back}
           </Link>

@@ -19,6 +19,106 @@
   box-sizing: border-box;
 }
 
+/* —— API wake / cold-start note —— */
+.api-wake {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  color: var(--ink);
+  background-color: #fff3c4;
+  background-image: var(--grain);
+  background-size: 160px 160px;
+  border: 2.5px solid var(--crayon);
+  border-radius: 8px 20px 12px 16px;
+  box-shadow:
+    3px 4px 0 rgba(20, 16, 42, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  transform: rotate(-0.45deg);
+}
+
+.api-wake--failed {
+  background-color: #f8e0e6;
+  transform: rotate(0.35deg);
+}
+
+.api-wake__tape {
+  position: absolute;
+  top: -0.55rem;
+  left: 1.35rem;
+  width: 4.4rem;
+  height: 1.05rem;
+  background: color-mix(in srgb, var(--mint) 72%, white);
+  opacity: 0.78;
+  transform: rotate(-4deg);
+  box-shadow: 0 1px 0 rgba(20, 16, 42, 0.12);
+}
+
+.api-wake__copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.35rem;
+  min-width: min(100%, 18rem);
+  flex: 1 1 16rem;
+}
+
+.api-wake__title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  font-family: var(--font-hand);
+  font-size: clamp(1.35rem, 2.4vw, 1.7rem);
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.api-wake__body {
+  margin: 0;
+  max-width: 46ch;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.api-wake__pulse {
+  flex: 0 0 auto;
+  width: 0.62rem;
+  height: 0.62rem;
+  border-radius: 50%;
+  background: #3f8f7a;
+  box-shadow: 0 0 0 0 rgba(63, 143, 122, 0.45);
+  animation: api-wake-pulse 1.35s ease-out infinite;
+}
+
+.api-wake__retry {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+}
+
+@keyframes api-wake-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(63, 143, 122, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 0.55rem rgba(63, 143, 122, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(63, 143, 122, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .api-wake__pulse {
+    animation: none;
+  }
+}
+
 /* —— Paper panels —— */
 .paper-panel {
   position: relative;

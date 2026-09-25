@@ -12,6 +12,7 @@ import { LocaleProvider } from "./context/LocaleContext";
 import { NoticeProvider } from "./context/NoticeContext";
 import { useArchive } from "./hooks/useArchive";
 import { useLocale } from "./hooks/useLocale";
+import { ApiWakeBanner } from "./reusableUI/ApiWakeBanner";
 import { Masthead } from "./reusableUI/Masthead";
 import { HomePage } from "./components/HomePage";
 import { AdminHomePage } from "./components/AdminHomePage";
@@ -43,11 +44,43 @@ function EditPostPage() {
   const navigate = useNavigate();
   const { copy, localizePath } = useLocale();
   const {
-    state: { posts, availableTags, availableSubtags },
+    state: { posts, availableTags, availableSubtags, loading, waking, error },
     updatePost,
+    refreshPosts,
   } = useArchive();
 
   const post = posts.find((item) => item.id === id);
+
+  if (!post && (loading || waking)) {
+    return (
+      <section className="home-welcome paper-panel paper-panel--lavender">
+        <p className="home-welcome__eyebrow">{copy.manage.missingEyebrow}</p>
+        <h2 className="home-welcome__title">{copy.connection.wakingTitle}</h2>
+        <p className="home-welcome__lede">{copy.connection.wakingBody}</p>
+      </section>
+    );
+  }
+
+  if (!post && error) {
+    return (
+      <section className="home-welcome paper-panel paper-panel--lavender">
+        <p className="home-welcome__eyebrow">{copy.manage.missingEyebrow}</p>
+        <h2 className="home-welcome__title">{copy.connection.unavailableTitle}</h2>
+        <p className="home-welcome__lede">{copy.connection.unavailableBody}</p>
+        <div className="home-welcome__actions">
+          <button
+            type="button"
+            className="btn btn--sticker"
+            onClick={() => {
+              void refreshPosts();
+            }}
+          >
+            {copy.connection.retry}
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   if (!post) {
     return (
@@ -115,6 +148,7 @@ function PublicLayout() {
     <div className="fanpage">
       <Masthead variant="public" />
       <main className="fanpage__frame">
+        <ApiWakeBanner />
         <Outlet />
       </main>
     </div>
@@ -126,6 +160,7 @@ function AdminLayout() {
     <div className="fanpage">
       <Masthead variant="admin" />
       <main className="fanpage__frame">
+        <ApiWakeBanner />
         <Outlet />
       </main>
     </div>

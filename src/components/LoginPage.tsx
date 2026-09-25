@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { isTransientApiError, withTransientRetry } from "../api/http";
 import { useAuth } from "../hooks/useAuth";
 import { useLocale } from "../hooks/useLocale";
+import { ApiWakeBanner } from "../reusableUI/ApiWakeBanner";
 import { LocaleSwitch } from "../reusableUI/LocaleSwitch";
 import {
   PaperPanel,
@@ -33,10 +35,19 @@ export function LoginPage() {
     setError(null);
     setIsSubmitting(true);
     try {
-      await login(username.trim(), password);
+      await withTransientRetry(
+        () => login(username.trim(), password),
+        { delaysMs: [0, 2500, 4000, 6000] },
+      );
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : copy.login.failed);
+      setError(
+        isTransientApiError(err)
+          ? copy.connection.unavailableBody
+          : err instanceof Error
+            ? err.message
+            : copy.login.failed,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -48,6 +59,7 @@ export function LoginPage() {
         <LocaleSwitch />
       </header>
       <main className="fanpage__frame">
+        <ApiWakeBanner />
         <PaperPanel id="login" variant="cream" className="compose">
           <PaperPanelHeader>
             <p className="compose__eyebrow">{copy.login.eyebrow}</p>

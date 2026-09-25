@@ -3,8 +3,15 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   type ReactNode,
 } from "react";
+import {
+  FIRST_WAKE_TIMEOUT_MS,
+  RETRY_TIMEOUT_MS,
+  isAbortError,
+  withTransientRetry,
+} from "../api/http";
 import {
   createPost,
   deletePost as deletePostRequest,
@@ -23,6 +30,7 @@ const initialState: ArchiveState = {
   availableTags: [],
   availableSubtags: [],
   loading: true,
+  waking: false,
   error: null,
 };
 
@@ -48,8 +56,10 @@ function archiveReducer(
   switch (action.type) {
     case "SET_LOADING":
       return { ...state, loading: action.payload };
+    case "SET_WAKING":
+      return { ...state, waking: action.payload };
     case "SET_ERROR":
-      return { ...state, error: action.payload };
+      return { ...state, error: action.payload, waking: false };
     case "SET_POSTS": {
       const posts = action.payload;
       return {
@@ -58,6 +68,7 @@ function archiveReducer(
         availableTags: collectTags(posts, "tags"),
         availableSubtags: collectTags(posts, "subtags"),
         loading: false,
+        waking: false,
         error: null,
       };
     }
@@ -101,13 +112,34 @@ function archiveReducer(
 
 export function ArchiveProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(archiveReducer, initialState);
+  const abortRef = useRef<AbortController | null>(null);
 
   const refreshPosts = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const { signal } = controller;
+
     dispatch({ type: "SET_LOADING", payload: true });
+    dispatch({ type: "SET_WAKING", payload: false });
+    dispatch({ type: "SET_ERROR", payload: null });
+
     try {
-      const posts = await fetchPosts();
+      const posts = await withTransientRetry(
+        (attempt) =>
+          fetchPosts({
+            signal,
+            timeoutMs: attempt === 0 ? FIRST_WAKE_TIMEOUT_MS : RETRY_TIMEOUT_MS,
+          }),
+        {
+          signal,
+          onRetry: () => dispatch({ type: "SET_WAKING", payload: true }),
+        },
+      );
+      if (signal.aborted) return;
       dispatch({ type: "SET_POSTS", payload: posts });
     } catch (error) {
+      if (signal.aborted || isAbortError(error)) return;
       const message =
         error instanceof Error ? error.message : "Failed to load posts";
       dispatch({ type: "SET_ERROR", payload: message });
@@ -117,6 +149,7 @@ export function ArchiveProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void refreshPosts();
+    return () => abortRef.current?.abort();
   }, [refreshPosts]);
 
   const addPost = useCallback(async (post: Post) => {

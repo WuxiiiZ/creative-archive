@@ -22,6 +22,7 @@ export interface Messages {
     sectionsLabel: string;
     sectionEyebrow: string;
     sectionEmpty: string;
+    sectionWaiting: string;
     sectionMore: string;
   };
   adminHome: {
@@ -69,6 +70,8 @@ export interface Messages {
     searchPlaceholder: string;
     filterEmptyTitle: string;
     filterEmptyBody: string;
+    waitingTitle: string;
+    waitingBody: string;
     summaryPrefix: string;
   };
   postDetail: {
@@ -181,6 +184,13 @@ export interface Messages {
     fallback: string;
     retry: string;
   };
+  connection: {
+    wakingTitle: string;
+    wakingBody: string;
+    unavailableTitle: string;
+    unavailableBody: string;
+    retry: string;
+  };
 }
 
 export const en: Messages = {
@@ -209,6 +219,7 @@ export const en: Messages = {
     sectionsLabel: "Archive sections",
     sectionEyebrow: "section",
     sectionEmpty: "Nothing in this section yet.",
+    sectionWaiting: "Still opening this page…",
     sectionMore: "Open section",
   },
   adminHome: {
@@ -257,6 +268,8 @@ export const en: Messages = {
     searchPlaceholder: "Search titles, notes, tags…",
     filterEmptyTitle: "No matching entries",
     filterEmptyBody: "Try another section or a shorter search.",
+    waitingTitle: "The scrapbook is still opening",
+    waitingBody: "Give the desk a moment — entries will land here when it wakes.",
     summaryPrefix: "Summary: ",
   },
   postDetail: {
@@ -369,6 +382,15 @@ export const en: Messages = {
     fallback: "An unexpected error occurred.",
     retry: "Try again",
   },
+  connection: {
+    wakingTitle: "The archive is waking up",
+    wakingBody:
+      "The desk was asleep. Give it about a minute — pages will appear when it sits up.",
+    unavailableTitle: "The desk is still stretching",
+    unavailableBody:
+      "Couldn’t reach the archive yet. Wait a moment, then try again.",
+    retry: "Try again",
+  },
 };
 
 export const zh: Messages = {
@@ -396,6 +418,7 @@ export const zh: Messages = {
     sectionsLabel: "三个分区",
     sectionEyebrow: "分区",
     sectionEmpty: "这一区还是空的。",
+    sectionWaiting: "这一页还在翻开…",
     sectionMore: "打开这一区",
   },
   adminHome: {
@@ -443,6 +466,8 @@ export const zh: Messages = {
     searchPlaceholder: "搜标题、正文、标签…",
     filterEmptyTitle: "没有匹配的内容",
     filterEmptyBody: "换个分区，或缩短搜索词再试。",
+    waitingTitle: "剪贴簿还在翻开",
+    waitingBody: "书桌刚醒来，再等一会儿，条目就会落到这一页。",
     summaryPrefix: "简介：",
   },
   postDetail: {
@@ -553,6 +578,13 @@ export const zh: Messages = {
   error: {
     title: "出了点问题",
     fallback: "发生了意外错误。",
+    retry: "再试一次",
+  },
+  connection: {
+    wakingTitle: "档案正在翻开",
+    wakingBody: "书桌刚从休眠里醒来，大约半分钟到一分钟。页码写好就会出现。",
+    unavailableTitle: "书桌还在伸懒腰",
+    unavailableBody: "暂时连不上档案。再等一会儿，然后重试一次。",
     retry: "再试一次",
   },
 };

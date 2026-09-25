@@ -3,6 +3,7 @@
  */
 import { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { isTransientApiError, withTransientRetry } from "../api/http";
 import {
   fetchDeskStats,
   type DeskDayStat,
@@ -253,7 +254,7 @@ const emptyDay = (day: string): DeskDayStat => ({
 export function AdminHomePage() {
   const { copy, locale, localizePath } = useLocale();
   const {
-    state: { posts, loading },
+    state: { posts, loading, waking },
   } = useArchive();
   const [dayTab, setDayTab] = useState<DayTab>("today");
   const [desk, setDesk] = useState<DeskStatsResponse | null>(null);
@@ -280,7 +281,7 @@ export function AdminHomePage() {
     let cancelled = false;
     void (async () => {
       try {
-        const next = await fetchDeskStats();
+        const next = await withTransientRetry(() => fetchDeskStats());
         if (!cancelled) {
           setDesk(next);
           setDeskError(null);
@@ -288,7 +289,11 @@ export function AdminHomePage() {
       } catch (error) {
         if (!cancelled) {
           setDeskError(
-            error instanceof Error ? error.message : copy.adminHome.loading,
+            isTransientApiError(error)
+              ? copy.connection.unavailableBody
+              : error instanceof Error
+                ? error.message
+                : copy.adminHome.loading,
           );
         }
       }
@@ -296,7 +301,11 @@ export function AdminHomePage() {
     return () => {
       cancelled = true;
     };
-  }, [copy.adminHome.loading, posts.length]);
+  }, [
+    copy.adminHome.loading,
+    copy.connection.unavailableBody,
+    posts.length,
+  ]);
 
   const activeDay =
     dayTab === "today"
@@ -474,7 +483,7 @@ export function AdminHomePage() {
           <p className="admin-desk__hint">{copy.adminHome.allStatsHint}</p>
         </header>
 
-        {loading && posts.length === 0 ? (
+        {(loading || waking) && posts.length === 0 ? (
           <p className="admin-desk__loading">{copy.adminHome.loading}</p>
         ) : (
           <>

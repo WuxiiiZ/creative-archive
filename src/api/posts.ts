@@ -1,6 +1,7 @@
 import type { Post } from "../types/post";
 import { asPostLanguage } from "../types/postLanguage";
 import { API_BASE_URL } from "./config";
+import { classifyHttpError, fetchApi } from "./http";
 import { getToken } from "./token";
 
 async function readErrorMessage(
@@ -42,10 +43,19 @@ function normalizePost(post: Post): Post {
   };
 }
 
-export async function fetchPosts(): Promise<Post[]> {
-  const response = await fetch(`${API_BASE_URL}/api/posts`);
+export async function fetchPosts(options?: {
+  timeoutMs?: number;
+  signal?: AbortSignal;
+}): Promise<Post[]> {
+  const response = await fetchApi(`${API_BASE_URL}/api/posts`, {
+    timeoutMs: options?.timeoutMs,
+    signal: options?.signal,
+  });
   if (!response.ok) {
-    throw new Error(`Failed to load posts (${response.status})`);
+    throw classifyHttpError(
+      response.status,
+      `Failed to load posts (${response.status})`,
+    );
   }
   const posts = (await response.json()) as Post[];
   return posts.map(normalizePost);

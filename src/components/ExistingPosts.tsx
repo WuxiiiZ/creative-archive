@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import type { Post } from "../types/post";
 import type { Section } from "../types/postSection";
 import PostCard from "../reusableUI/PostCard";
+import { useArchive } from "../hooks/useArchive";
 import { useLocale } from "../hooks/useLocale";
 import {
   PaperPanel,
@@ -42,6 +43,10 @@ export function ExistingPosts({
   showFilters = false,
 }: ExistingPostsProps) {
   const { copy, localizePath } = useLocale();
+  const {
+    state: { loading, waking, error },
+  } = useArchive();
+  const waiting = (loading || waking || Boolean(error)) && posts.length === 0;
   const [searchParams, setSearchParams] = useSearchParams();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -159,14 +164,18 @@ export function ExistingPosts({
           {visiblePosts.length === 0 ? (
             <div className="feed__empty">
               <strong>
-                {showFilters && (query.trim() || section !== "all")
-                  ? copy.posts.filterEmptyTitle
-                  : copy.posts.emptyTitle}
+                {waiting
+                  ? copy.posts.waitingTitle
+                  : showFilters && (query.trim() || section !== "all")
+                    ? copy.posts.filterEmptyTitle
+                    : copy.posts.emptyTitle}
               </strong>
               <p>
-                {showFilters && (query.trim() || section !== "all")
-                  ? copy.posts.filterEmptyBody
-                  : copy.posts.emptyBody}
+                {waiting
+                  ? copy.posts.waitingBody
+                  : showFilters && (query.trim() || section !== "all")
+                    ? copy.posts.filterEmptyBody
+                    : copy.posts.emptyBody}
               </p>
             </div>
           ) : (

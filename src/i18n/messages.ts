@@ -20,8 +20,8 @@ export interface Messages {
     lede: string;
     postsCta: string;
     sectionsLabel: string;
-    sectionEyebrow: string;
-    sectionEmpty: string;
+    sectionKind: { A: string; B: string; C: string };
+    sectionEmpty: { A: string; B: string; C: string };
     sectionWaiting: string;
     sectionMore: string;
   };
@@ -218,10 +218,18 @@ export const en: Messages = {
     lede: "Flip through diary crumbs, soft galleries, and notes already saved in the archive.",
     postsCta: "All Content",
     sectionsLabel: "Archive sections",
-    sectionEyebrow: "section",
-    sectionEmpty: "Nothing in this section yet.",
+    sectionKind: {
+      A: "notebook",
+      B: "scratch paper",
+      C: "photo paper",
+    },
+    sectionEmpty: {
+      A: "This notebook is still a blank page.",
+      B: "No marks on the scratch paper yet.",
+      C: "Nothing taped into the gallery yet.",
+    },
     sectionWaiting: "Still opening this page…",
-    sectionMore: "Open section",
+    sectionMore: "There's more in this book",
   },
   adminHome: {
     eyebrow: "admin desk",
@@ -418,10 +426,18 @@ export const zh: Messages = {
     lede: "翻看已经收进档案的日记碎屑、柔软展廊，和随手记下的句子。",
     postsCta: "所有内容",
     sectionsLabel: "三个分区",
-    sectionEyebrow: "分区",
-    sectionEmpty: "这一区还是空的。",
+    sectionKind: {
+      A: "日记本",
+      B: "草稿纸",
+      C: "相纸",
+    },
+    sectionEmpty: {
+      A: "这一本还是空白页。",
+      B: "草稿纸上还没有记号。",
+      C: "展廊里还没有贴上照片。",
+    },
     sectionWaiting: "这一页还在翻开…",
-    sectionMore: "打开这一区",
+    sectionMore: "这一本里还有",
   },
   adminHome: {
     eyebrow: "后台书桌",

@@ -15,6 +15,7 @@ import { NoticeProvider } from "./context/NoticeContext";
 import { useArchive } from "./hooks/useArchive";
 import { useLocale } from "./hooks/useLocale";
 import { ApiWakeBanner } from "./reusableUI/ApiWakeBanner";
+import { DeskAtmosphere } from "./reusableUI/DeskAtmosphere";
 import { Masthead } from "./reusableUI/Masthead";
 import { HomePage } from "./components/HomePage";
 import { AdminHomePage } from "./components/AdminHomePage";
@@ -154,6 +155,7 @@ function PublicLayout() {
 
   return (
     <div className="fanpage">
+      <DeskAtmosphere />
       <Masthead variant="public" />
       <main className="fanpage__frame">
         <ApiWakeBanner />
@@ -166,6 +168,7 @@ function PublicLayout() {
 function AdminLayout() {
   return (
     <div className="fanpage">
+      <DeskAtmosphere />
       <Masthead variant="admin" />
       <main className="fanpage__frame">
         <ApiWakeBanner />

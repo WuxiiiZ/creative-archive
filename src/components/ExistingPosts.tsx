@@ -95,6 +95,7 @@ export function ExistingPosts({
     <div className="feed-page">
       {showFilters ? (
         <section className="feed-toolbar" aria-label={copy.posts.filterLabel}>
+          <span className="feed-toolbar__tape" aria-hidden="true" />
           <div className="feed-toolbar__sections" role="group">
             {SECTION_OPTIONS.map((value) => {
               const active = section === value;

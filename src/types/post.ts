@@ -13,7 +13,7 @@ export interface Post {
   tags: string[];
   subtags: string[];
   images: string[];
-  /** Public detail-page views (session-deduped on the client). */
+  /** Public detail-page clicks; every visit increments. */
   viewCount: number;
 
   createdAt: string;

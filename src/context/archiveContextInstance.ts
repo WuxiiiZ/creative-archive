@@ -18,6 +18,7 @@ export type ArchiveAction =
   | { type: "SET_POSTS"; payload: Post[] }
   | { type: "ADD_POST"; payload: Post }
   | { type: "UPDATE_POST"; payload: Post }
+  | { type: "SET_VIEW_COUNT"; payload: { id: string; viewCount: number } }
   | { type: "REMOVE_POST"; payload: string };
 
 export interface ArchiveContextValue {
@@ -26,6 +27,7 @@ export interface ArchiveContextValue {
   addPost: (post: Post) => Promise<void>;
   updatePost: (post: Post) => Promise<void>;
   deletePost: (id: string) => Promise<void>;
+  recordView: (id: string) => Promise<void>;
   refreshPosts: () => Promise<void>;
 }
 

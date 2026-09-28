@@ -199,7 +199,7 @@ export function LocaleSwitch() {
       if (next !== locale) {
         // Keep the settle animation alive; layout stays mounted across locales.
         startTransition(() => {
-          navigate(switchPath(next));
+          navigate(switchPath(next), { replace: true });
         });
       }
     },

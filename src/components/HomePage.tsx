@@ -67,6 +67,9 @@ export function HomePage() {
                             {post.title}
                           </span>
                         </span>
+                        <span className="home-section__post-views">
+                          {copy.posts.views(post.viewCount ?? 0)}
+                        </span>
                         {summary ? (
                           <span className="home-section__post-summary">
                             {copy.posts.summaryPrefix}

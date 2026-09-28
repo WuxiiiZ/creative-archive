@@ -16,6 +16,7 @@ import {
   createPost,
   deletePost as deletePostRequest,
   fetchPosts,
+  recordPostView,
   updatePost as updatePostRequest,
 } from "../api/posts";
 import type { Post } from "../types/post";
@@ -95,6 +96,15 @@ function archiveReducer(
         error: null,
       };
     }
+    case "SET_VIEW_COUNT": {
+      const { id, viewCount } = action.payload;
+      return {
+        ...state,
+        posts: state.posts.map((item) =>
+          item.id === id ? { ...item, viewCount } : item,
+        ),
+      };
+    }
     case "REMOVE_POST": {
       const posts = state.posts.filter((item) => item.id !== action.payload);
       return {
@@ -167,6 +177,12 @@ export function ArchiveProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "REMOVE_POST", payload: id });
   }, []);
 
+  const recordView = useCallback(async (id: string) => {
+    const viewCount = await recordPostView(id);
+    if (viewCount == null) return;
+    dispatch({ type: "SET_VIEW_COUNT", payload: { id, viewCount } });
+  }, []);
+
   const value = useMemo(
     () => ({
       state,
@@ -174,9 +190,10 @@ export function ArchiveProvider({ children }: { children: ReactNode }) {
       addPost,
       updatePost,
       deletePost,
+      recordView,
       refreshPosts,
     }),
-    [state, addPost, updatePost, deletePost, refreshPosts],
+    [state, addPost, updatePost, deletePost, recordView, refreshPosts],
   );
 
   return (

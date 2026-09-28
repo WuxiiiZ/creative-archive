@@ -73,6 +73,7 @@ export interface Messages {
     waitingTitle: string;
     waitingBody: string;
     summaryPrefix: string;
+    views: (n: number) => string;
   };
   postDetail: {
     back: string;
@@ -271,6 +272,7 @@ export const en: Messages = {
     waitingTitle: "The scrapbook is still opening",
     waitingBody: "Give the desk a moment — entries will land here when it wakes.",
     summaryPrefix: "Summary: ",
+    views: (n) => (n === 1 ? "1 view" : `${n} views`),
   },
   postDetail: {
     back: "All Content",
@@ -469,6 +471,7 @@ export const zh: Messages = {
     waitingTitle: "剪贴簿还在翻开",
     waitingBody: "书桌刚醒来，再等一会儿，条目就会落到这一页。",
     summaryPrefix: "简介：",
+    views: (n) => `${n} 次点击`,
   },
   postDetail: {
     back: "所有内容",

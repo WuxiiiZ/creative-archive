@@ -135,7 +135,7 @@ export async function deletePost(id: string): Promise<void> {
   }
 }
 
-/** Record one public view (caller should session-dedupe). */
+/** Record one public click / detail-page visit. */
 export async function recordPostView(id: string): Promise<number | null> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/posts/${id}/view`, {

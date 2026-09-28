@@ -3,7 +3,6 @@
  */
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { recordPostView } from "../api/posts";
 import { useArchive } from "../hooks/useArchive";
 import { useLocale } from "../hooks/useLocale";
 import {
@@ -11,6 +10,7 @@ import {
   PaperPanelBody,
 } from "../reusableUI/PaperPanel";
 import { PostLanguageTag } from "../reusableUI/PostLanguageTag";
+import { claimPostViewVisit } from "../utils/postViewVisit";
 
 function formatDate(iso: string, locale: string) {
   return new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en", {
@@ -25,6 +25,7 @@ export function PostDetailPage() {
   const {
     state: { posts, loading, waking, error },
     refreshPosts,
+    recordView,
   } = useArchive();
 
   const post = posts.find((item) => item.id === id);
@@ -34,15 +35,9 @@ export function PostDetailPage() {
 
   useEffect(() => {
     if (!id || !post) return;
-    const key = `creative-archive:viewed:${id}`;
-    try {
-      if (sessionStorage.getItem(key)) return;
-      sessionStorage.setItem(key, "1");
-    } catch {
-      // private mode — still record once this mount
-    }
-    void recordPostView(id);
-  }, [id, post]);
+    if (!claimPostViewVisit(id)) return;
+    void recordView(id);
+  }, [id, post, recordView]);
 
   if ((loading || waking) && !post) {
     return (
@@ -101,15 +96,20 @@ export function PostDetailPage() {
 
       <header className="post-detail__header">
         <div className="post-detail__meta-row">
-          <span
-            className={`post-entry__section post-entry__section--${post.section}`}
-          >
-            {copy.section[post.section]}
+          <div className="post-entry__top-main">
+            <span
+              className={`post-entry__section post-entry__section--${post.section}`}
+            >
+              {copy.section[post.section]}
+            </span>
+            <PostLanguageTag language={post.language} />
+            <time className="post-detail__time" dateTime={post.createdAt}>
+              {formatDate(post.createdAt, locale)}
+            </time>
+          </div>
+          <span className="post-entry__views">
+            {copy.posts.views(post.viewCount ?? 0)}
           </span>
-          <PostLanguageTag language={post.language} />
-          <time className="post-detail__time" dateTime={post.createdAt}>
-            {formatDate(post.createdAt, locale)}
-          </time>
         </div>
         <h1 className="post-detail__title">{post.title}</h1>
       </header>

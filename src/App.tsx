@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import {
   BrowserRouter,
   Outlet,
   Route,
   Routes,
+  useLocation,
   useNavigate,
   useParams,
 } from "react-router-dom";
@@ -22,6 +24,7 @@ import { PostDetailPage } from "./components/PostDetailPage";
 import { LoginPage } from "./components/LoginPage";
 import { NotFoundPage } from "./components/NotFoundPage";
 import { RequireAuth } from "./components/RequireAuth";
+import { releasePostViewVisit } from "./utils/postViewVisit";
 import "./App.css";
 
 function NewPostPage() {
@@ -144,6 +147,11 @@ function adminDeskPages() {
 }
 
 function PublicLayout() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    releasePostViewVisit(pathname);
+  }, [pathname]);
+
   return (
     <div className="fanpage">
       <Masthead variant="public" />

@@ -71,15 +71,20 @@ function PostCard({
   return (
     <article className="post-entry paper-panel paper-panel--cream">
       <div className="post-entry__top">
-        <span
-          className={`post-entry__section post-entry__section--${post.section}`}
-        >
-          {copy.section[post.section]}
+        <div className="post-entry__top-main">
+          <span
+            className={`post-entry__section post-entry__section--${post.section}`}
+          >
+            {copy.section[post.section]}
+          </span>
+          <PostLanguageTag language={post.language} />
+          <time className="post-entry__time" dateTime={post.createdAt}>
+            {formatDate(post.createdAt, locale)}
+          </time>
+        </div>
+        <span className="post-entry__views">
+          {copy.posts.views(post.viewCount ?? 0)}
         </span>
-        <PostLanguageTag language={post.language} />
-        <time className="post-entry__time" dateTime={post.createdAt}>
-          {formatDate(post.createdAt, locale)}
-        </time>
       </div>
 
       {detailTo ? (
